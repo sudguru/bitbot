@@ -28,6 +28,7 @@ $(document).ready(function() {
 
 
     $('.btn-recalculate').on('click', function(e) {
+        $('.table tbody').html('');
         recalculate();
     });
 
