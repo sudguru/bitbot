@@ -1,3 +1,17 @@
 body {
     padding-top: 80px;
 }
+
+* {
+	font-family: Roboto;
+	font-weight: 300;
+}
+
+.caption-text {
+	color: #ddd;
+}
+
+.data-text {
+	font-weight: 400;
+}
+

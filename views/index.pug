@@ -1,8 +1,49 @@
-extends layout
-
-block content
-    h1 #{title}
-    ul.list-group
-        each article, i in articles
-            li.list-group-item
-                a(href="/article/"+article._id)= article.title
+doctype html
+html(lang='en')
+  head
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1, shrink-to-fit=no')
+    meta(name='description', content='')
+    meta(name='author', content='')
+    link(rel='icon', href='/favicon.ico')
+    title BitBot
+    // Bootstrap core CSS
+    link(rel='stylesheet' href='/bower_components/bootstrap/dist/css/bootstrap.css')
+    link(rel='stylesheet' href='/cover.css')
+  body.text-center.coverbg
+    .cover-container.d-flex.w-100.h-100.p-3.mx-auto.flex-column
+      header.masthead.mb-auto
+        .inner
+          h3.masthead-brand BitBot
+          nav.nav.nav-masthead.justify-content-center
+            if user
+                a.nav-link.active(href='#') Home
+                a.nav-link(href='/payments') Dashboard
+                a.nav-link(href='/users/logout') Log out
+            else
+                a.nav-link(href='/users/register') Register
+                a.nav-link.active(href='/users/login') Login
+            
+      main.inner.cover(role='main')
+        h1.cover-heading Payment Made Easy.
+        p.lead
+          | Fetch, Evaluate and Distribute.        
+        p.lead
+          if !user
+            a.btn.btn-lg.btn-secondary(href='/users/login') Login
+          else
+            a.btn.btn-lg.btn-secondary(href='/payments') Dashboard
+      footer.mastfoot.mt-auto
+        .inner
+          p
+            if user
+              | Logged in as: 
+              a(href='https://getbootstrap.com/')= user.name
+    //
+      Bootstrap core JavaScript
+      ==================================================
+    // Placed at the end of the document so the pages load faster
+    script(src='/bower_components/jquery/dist/jquery.js')
+    script(src='/bower_components/bootstrap/dist/js/bootstrap.js')
+    script(src='/popper.js')
+    //script(src='/main.js')
