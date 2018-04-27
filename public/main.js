@@ -28,7 +28,14 @@ $(document).ready(function() {
 
 
     $('.btn-recalculate').on('click', function(e) {
-        $('.table tbody').html('');
+        $('.table tbody').html(`<tr>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                    <td style="text-align: right">&nbsp;</td>
+                    <td style="text-align: right">&nbsp;</td>
+                    <td style="text-align: right">&nbsp;</td>
+                </tr>`);
         recalculate();
     });
 
