@@ -1,0 +1,12 @@
+extends layout
+
+block content
+  h3 History
+  ul.list-group
+    each batch, i in batches
+      li.list-group-item
+        a(href="/payments/history/"+batch._id)= batch.batch_name
+        br
+        span.small= batch.batch_timestamp
+        br
+        | Distributed Amount: #{batch.distribution_amount}

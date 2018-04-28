@@ -26,6 +26,34 @@ $(document).ready(function() {
 
     recalculate();
 
+    $('.btn-save').on('click', function(e) {
+        if( $('.txt-batchname').val() === '' ) {
+            alert('You must provide a unique BATCH NAME to this payment batch.');
+            return;
+        }
+        const batch_name = $('.txt-batchname').val();
+        const balance = parseFloat(localStorage.getItem('balance')); 
+        const payments = JSON.parse(localStorage.getItem('refined'));
+        const distribution_amount = JSON.parse(localStorage.getItem('distribution_amount'));
+        const fees = JSON.parse(localStorage.getItem('fees'));
+        const five = JSON.parse(localStorage.getItem('five'));
+        const holders_count = parseInt(localStorage.getItem('holders_count'));
+        $.ajax({
+            type: 'POST',
+            url: '/payments/add',
+            data: JSON.stringify({ payments, balance, distribution_amount, fees, five, batch_name, holders_count }),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: (res) => {
+                console.log(res);
+                alert('Done!');
+                window.location.href='/payments/history';
+            },
+            error: (err) => {
+                console.log(err);
+            }
+        });
+    });
 
     $('.btn-recalculate').on('click', function(e) {
         $('.table tbody').html(`<tr>
@@ -78,6 +106,7 @@ $(document).ready(function() {
                         part2 = res;
                         part = part1.concat(part2);
                         $('.holders_count').html(part.length);
+                        localStorage.setItem('holders_count', part.length);
                         localStorage.setItem('distribution', JSON.stringify(part));
                         CalculateAndAddRows(part);        
                     },
@@ -109,6 +138,9 @@ $(document).ready(function() {
             row['payment'] = pay.toFixed(5);
             return row;
         });
+        
+        localStorage.setItem('refined', JSON.stringify(refined));
+
         refined.forEach((row,i) => {
             $('.table tbody tr:last').after(`<tr>
                     <td>${i+1}</td>

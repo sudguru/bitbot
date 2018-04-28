@@ -27,4 +27,4 @@ let paymentSchema = mongoose.Schema({
   }
 });
 
-let Payment = module.exports = mongoose.model('Payment', paymentSchema);
+let Payment = module.exports = mongoose.model('Payment', paymentSchema, 'payments');

@@ -17,9 +17,9 @@ html
           ul.navbar-nav.mr-auto
             li.nav-item
               if user
-                li.nav-item.active
-                  a.nav-link(href='/payments/history') Dashboard
-                li.nav-item
+                li.nav-item(class=(pagename === 'dashboard') ? 'active' : '')
+                  a.nav-link(href='/payments') Dashboard
+                li.nav-item(class=(pagename === 'history') ? 'active' : '')
                   a.nav-link(href='/payments/history') View History
           ul.navbar-nav
             if user
@@ -47,4 +47,5 @@ html
 
     script(src='/bower_components/jquery/dist/jquery.js')
     script(src='/bower_components/bootstrap/dist/js/bootstrap.js')
-    script(src='/main.js')
+    if pagename === 'dashboard'
+      script(src='/main.js')

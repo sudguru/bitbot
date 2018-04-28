@@ -13,6 +13,7 @@ let batchSchema = mongoose.Schema({
   for_fees_amount: { type: Number, required: true },
   distribution_amount: { type: Number, required: true },
   payment_date: { type: Date, required: true },
+  holders_count: { type: Number, required: true },
   user_id: { type: String, required: true }
 });
 
