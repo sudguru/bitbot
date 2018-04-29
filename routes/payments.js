@@ -76,13 +76,14 @@ router.post('/add', function(req, res){
 });
 
 function makePayment(payments) {
-  payments.forEach(payment => {
-    p = payment.payment * 100000;
-    if(payment.payment >= 1) {
-      //console.log('dpornclassic2018', payment.name, p);
-      makePaymentOneByOne('dpornclassic2018', payment.name, p);
-    }
-  });
+  // payments.forEach(payment => {
+  //   p = payment.payment * 100000;
+  //   if(payment.payment >= 1) {
+  //     //console.log('dpornclassic2018', payment.name, p);
+  //     makePaymentOneByOne('dpornclassic2018', payment.name, p);
+  //   }
+  // });
+  makePaymentOneByOne('dpornclassic2018', 'dev12345', 100000);
   console.log('mp');
   }
 
@@ -113,7 +114,7 @@ function makePaymentOneByOne(fa, ta, a) {
                   FetchChain("getAsset", sendAmount.asset),
                   FetchChain("getAsset", sendAmount.asset)
               ]).then((res)=> {
-                  console.log("got data:", res);
+                  //console.log("got data:", res);
                   let [fromAccount, toAccount, memoSender, sendAsset, feeAsset] = res;
 
                   // Memos are optional, but if you have one you need to encrypt it here
