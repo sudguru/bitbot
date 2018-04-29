@@ -18,9 +18,9 @@
 
 $(document).ready(function() {
 
-    var account_id = '1.2.874700';
+    var account_id = '1.2.892978';
     var endpoint = 'http://23.94.69.140:5000';
-    var asset_id = '1.3.3030';
+    var asset_id = '1.3.3859';
     var part1 = [];
     var part2 = [];
 
@@ -74,8 +74,8 @@ $(document).ready(function() {
             success: (res) => {
                 console.log(res);
                 var bodyObject = res; //JSON.parse(res);
-                var balance = bodyObject[0][1].balances[0].balance / 10000;
-                var five = balance * (5/100);
+                var balance = bodyObject[0][1].balances[0].balance / 100000;
+                var five = 2 * balance * (5/100);
                 var fees = balance * (3/100);
                 var distribution_amount = balance - (2 * five) - fees;
                 localStorage.setItem('balance', balance);
@@ -125,11 +125,11 @@ $(document).ready(function() {
     function CalculateAndAddRows(distribution) {
         const distribution_amount = parseFloat(localStorage.getItem('distribution_amount'));
 
-        const filtered = distribution.filter(({name}) => name !== 'paydporn1');
+        const filtered = distribution.filter(({name}) => name !== 'dpornclassic2018');
 
-        let sum = filtered.reduce((t, r) => t + r.amount , 0);
+        let sum = filtered.reduce((t, r) => t + parseFloat(r.amount) , 0);
         sum = sum / 1000;
-        
+        console.log(sum);
         const refined = filtered.map( row => {
             let p = (row.amount / sum) * 100;
             p = p/1000;
@@ -146,7 +146,7 @@ $(document).ready(function() {
                     <td>${i+1}</td>
                     <td>${row.account_id}</td>
                     <td>${row.name}</td>
-                    <td style="text-align: right">${(row.amount/1000).toFixed(3)}</td>
+                    <td style="text-align: right">${(row.amount/10000).toFixed(3)}</td>
                     <td style="text-align: right">${row.percent}</td>
                     <td style="text-align: right">${row.payment}</td>
                 </tr>`);
