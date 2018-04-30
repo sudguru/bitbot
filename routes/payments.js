@@ -56,8 +56,8 @@ router.post('/add', function(req, res){
     if(err){
       console.log(err);
       return;
-      //continue
     }
+    //continue
   });
   //pending add newly added batch_id to Payment model
   const payment_with_batch_id = payments.map(payment => {
@@ -67,96 +67,109 @@ router.post('/add', function(req, res){
     if (err){ 
       return console.error(err);
     } else {
-      console.log('ss')
-      makePayment(payments);
-      res.json("{}");
+      res.json({ "batch_id": batch._id.toHexString() });
     }
   });
     
 });
 
-function makePayment(payments) {
-  // payments.forEach(payment => {
-  //   p = payment.payment * 100000;
-  //   if(payment.payment >= 1) {
-  //     //console.log('dpornclassic2018', payment.name, p);
-  //     makePaymentOneByOne('dpornclassic2018', payment.name, p);
-  //   }
-  // });
-  makePaymentOneByOne('dpornclassic2018', 'dev12345', 100000);
-  console.log('mp');
-  }
 
-function makePaymentOneByOne(fa, ta, a) {
-  console.log('mp1enter');
-  Apis.instance("wss://bitshares.openledger.info/ws", true)
-  .init_promise.then((res) => {
-      console.log("connected to:", res[0].network_name, "network");
+router.post('/pay/:id', ensureAuthenticated, function(req, res){
+   console.log(req.params.id);
+   Payment.findById(req.params.id, function(err, payment){
+      p = payment.payment * 100000;
+      makePaymentOneByOne('dpornclassic2018', payment.name, p).then(err => {
+        if(!err) {
+          //update payment
+          var query = {'_id':req.params.id};
+          Payment.findOneAndUpdate(query, { done: true }, function(err, doc){
+              if (err) return res.send(500, { error: err });
+              //return res.send("succesfully saved");
+          });
+        }
+        res.send(err);
+      })
+      
+    });
+ 
+});
 
-      ChainStore.init().then(() => {
 
-          let fromAccount = fa
-          let memoSender = fromAccount;
-          let memo = "Testing";
+async function makePaymentOneByOne(fa, ta, a) {
+    er = false;  
+    await Apis.instance("wss://bitshares.openledger.info/ws", true)
+    .init_promise.then((res) => {
+        console.log("connected to:", res[0].network_name, "network");
 
-          let toAccount = ta;
+        ChainStore.init().then(() => {
 
-          let sendAmount = {
-              amount: a,
-              asset: "BTS"
-          }
-          console.log(sendAmount.amount);
+            let fromAccount = fa
+            let memoSender = fromAccount;
+            let memo = "dpornclassic Testing";
 
-          Promise.all([
-                  FetchChain("getAccount", fromAccount),
-                  FetchChain("getAccount", toAccount),
-                  FetchChain("getAccount", memoSender),
-                  FetchChain("getAsset", sendAmount.asset),
-                  FetchChain("getAsset", sendAmount.asset)
-              ]).then((res)=> {
-                  //console.log("got data:", res);
-                  let [fromAccount, toAccount, memoSender, sendAsset, feeAsset] = res;
+            let toAccount = ta;
 
-                  // Memos are optional, but if you have one you need to encrypt it here
-                  let memoFromKey = memoSender.getIn(["options","memo_key"]);
-                  console.log("memo pub key:", memoFromKey);
-                  let memoToKey = toAccount.getIn(["options","memo_key"]);
-                  let nonce = TransactionHelper.unique_nonce_uint64();
+            let sendAmount = {
+                amount: a,
+                asset: "BTS"
+            }
+            console.log(sendAmount.amount);
 
-                  let memo_object = {
-                      from: memoFromKey,
-                      to: memoToKey,
-                      nonce,
-                      message: Aes.encrypt_with_checksum(
-                          pKey,
-                          memoToKey,
-                          nonce,
-                          memo
-                      )
-                  }
+            Promise.all([
+                    FetchChain("getAccount", fromAccount),
+                    FetchChain("getAccount", toAccount),
+                    FetchChain("getAccount", memoSender),
+                    FetchChain("getAsset", sendAmount.asset),
+                    FetchChain("getAsset", sendAmount.asset)
+                ]).then((res)=> {
+                    //console.log("got data:", res);
+                    let [fromAccount, toAccount, memoSender, sendAsset, feeAsset] = res;
 
-                  let tr = new TransactionBuilder()
+                    // Memos are optional, but if you have one you need to encrypt it here
+                    let memoFromKey = memoSender.getIn(["options","memo_key"]);
+                    console.log("memo pub key:", memoFromKey);
+                    let memoToKey = toAccount.getIn(["options","memo_key"]);
+                    let nonce = TransactionHelper.unique_nonce_uint64();
 
-                  tr.add_type_operation( "transfer", {
-                      fee: {
-                          amount: 0,
-                          asset_id: feeAsset.get("id")
-                      },
-                      from: fromAccount.get("id"),
-                      to: toAccount.get("id"),
-                      amount: { amount: sendAmount.amount, asset_id: sendAsset.get("id") },
-                      memo: memo_object
-                  } )
+                    let memo_object = {
+                        from: memoFromKey,
+                        to: memoToKey,
+                        nonce,
+                        message: Aes.encrypt_with_checksum(
+                            pKey,
+                            memoToKey,
+                            nonce,
+                            memo
+                        )
+                    }
 
-                  tr.set_required_fees().then(() => {
-                      tr.add_signer(pKey, pKey.toPublicKey().toPublicKeyString());
-                      console.log("serialized transaction:", tr.serialize());
-                      tr.broadcast();
-                  })
-                  console.log('mp1exit');
-              });
-      });
-  });
+                    let tr = new TransactionBuilder()
+
+                    tr.add_type_operation( "transfer", {
+                        fee: {
+                            amount: 0,
+                            asset_id: feeAsset.get("id")
+                        },
+                        from: fromAccount.get("id"),
+                        to: toAccount.get("id"),
+                        amount: { amount: sendAmount.amount, asset_id: sendAsset.get("id") },
+                        memo: memo_object
+                    } )
+
+                    tr.set_required_fees().then(() => {
+                        tr.add_signer(pKey, pKey.toPublicKey().toPublicKeyString());
+                        console.log("serialized transaction:", tr.serialize());
+                        tr.broadcast();
+                    })
+                });
+        });
+    }).catch( reason => {
+      //console.error( 'onRejected function called: ', reason );
+        er = true;
+        console.log('errrrr', er);
+    });
+
+    return er;
 }
 
 // Delete Article
@@ -194,11 +207,10 @@ router.get('/history', ensureAuthenticated, function(req, res){
   });
 });
 
-// Get Single Article
+// Get Single History
 router.get('/history/:id', ensureAuthenticated,  function(req, res){
   Batch.findById(req.params.id, function(err, batch){
     Payment.find({batch_id:batch._id}, function(err, payments){
-      console.log('p', payments);
       res.render('historydetail', {
         batch:batch,
         payments: payments,

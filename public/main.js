@@ -46,8 +46,8 @@ $(document).ready(function() {
             dataType: "json",
             success: (res) => {
                 console.log(res);
-                alert('Done!');
-                window.location.href='/payments/history';
+                var batch_id = res.batch_id
+                window.location.href='/payments/history/'+batch_id;
             },
             error: (err) => {
                 console.log(err);
@@ -136,13 +136,16 @@ $(document).ready(function() {
             let pay = distribution_amount * (p/100);
             row['percent'] = p.toFixed(5);          
             row['payment'] = pay.toFixed(5);
+            row['done'] = false;
             return row;
         });
         
         localStorage.setItem('refined', JSON.stringify(refined));
 
         refined.forEach((row,i) => {
-            $('.table tbody tr:last').after(`<tr>
+            var style = '';
+            if(row.payment < 0.01) style="color:#aaa";
+            $('.table tbody tr:last').after(`<tr style='${style}'>
                     <td>${i+1}</td>
                     <td>${row.account_id}</td>
                     <td>${row.name}</td>
@@ -152,4 +155,9 @@ $(document).ready(function() {
                 </tr>`);
         })
     }
+
+    $('body ').on('click', 'table tbody tr td a.pay', function() {
+        var account_id = $(this).data('id');
+        alert(account_id);
+    })
 });

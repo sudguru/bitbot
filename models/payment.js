@@ -24,6 +24,10 @@ let paymentSchema = mongoose.Schema({
   payment:{
     type: Number,
     required: true
+  },
+  done: {
+    type: Boolean,
+    required: true
   }
 });
 

@@ -4,7 +4,7 @@ block content
 	h3 History Detail
 	.container
 		.row
-			.col-12.col-md-9
+			.col-12.col-md-12
 				.card.text-white.bg-info.mb-3
 					.card-header Batch : #{batch.batch_name}
 					.card-body
@@ -67,7 +67,12 @@ block content
 								td.text-right= payment.amount
 								td.text-right= payment.percent
 								td.text-right= payment.payment
-			.col-12.col-md-3
+								td.text-right
+									if payment.done
+										| Paid
+									else 
+										a.btn.btn-warning.pay(href='javascript:void(0)' data-id=`${payment._id}`) Pay
+
 				
 
 //- p= article.body
